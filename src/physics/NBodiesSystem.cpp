@@ -2,6 +2,9 @@
 
 
 
+const position_type NBodiesSystem::G = 1;
+const position_type NBodiesSystem::efactor = 0.001;
+
 NBodiesSystem::NBodiesSystem(
 	unsigned D, unsigned N, 
 	Params<position_type>& p_0,
@@ -36,7 +39,7 @@ void NBodiesSystem::step_a () {
 					r_axis[d] * r_axis[d];
 			}
 
-			position_type a_scalar = G * m[0][j] / r_squared;
+			position_type a_scalar = G * m[0][j] / (r_squared + 0.5);
 
 			for (int d = 0; d < D; ++d)
 				a[d][i] = -1 * a_scalar * (r_axis[d]/r_squared);
@@ -60,12 +63,12 @@ void NBodiesSystem::step( time_type delta_t ) {
 	step_a();
 } 
 
-const Params<position_type>* NBodiesSystem::getPositions() {
+Params<position_type>* NBodiesSystem::getPositions() {
 	return &p_curr;
 }
 
 void NBodiesSystem::printPositions() {
 	using namespace std;
 	cout << "Position" << endl;
-	cout << p_curr << endl << endl ; 
+	cout << "\t" << p_curr << endl << endl ; 
 }

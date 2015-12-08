@@ -2,3 +2,6 @@ build/*
 bin/*
 .removed/*
 .projectsFiles/*
+*.o
+src/__experiments/*
+test.md

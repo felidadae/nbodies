@@ -5,6 +5,29 @@
 
 
 
+typedef float position_type;
+typedef float mass_type;
+typedef double time_type;
+
+static const int X = 0;
+static const int Y = 1;
+static const int Z = 2;
+
+
+
+/*
+	@Abbreviations/naming scheme
+		@D <- dimensions count (2 for 2d, 3 for 3d, etc.)
+		@N <- bodies count
+
+	@Description:
+		data is kept as dynamically alocated array;
+			[all data from dimension 0] [all data from dimension 1] ...
+		to focus only on one dimension use [] operator 
+			e.g. 
+			Params<float> position(3, 5); 
+			position[DIM=2][ELEMENT=3];
+*/
 template<typename T>
 class Params {
 public:
@@ -13,7 +36,7 @@ public:
 	unsigned getN() const { return N; }
 	Params(unsigned D, unsigned N);
 	~Params();
-	inline T* operator [] (unsigned d);
+	inline 			T* operator [] (unsigned d);
 	inline void operator = (Params& other);
 	inline void setAllElementsTo (T value);
 private:
