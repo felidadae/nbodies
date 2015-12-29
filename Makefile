@@ -1,6 +1,7 @@
 
 
 
+
 #-------------------------------------------------------------
 include cuda.md
 include opengl.md
@@ -9,6 +10,9 @@ DIR_BIN := bin
 SHELL := /bin/bash
 
 all: nbodies
+doc: doc/report.pdf
+doc/report.pdf: doc/report.tex
+	pdflatex doc/report.tex
 #-------------------------------------------------------------
 
 
@@ -30,7 +34,8 @@ $(DIR_BIN)/nbodies_physicsOnly: $(OBJ_PHYSICS) $(DIR_BUILD_PHYSICS)/test__physic
 	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ $+
 
 $(DIR_BUILD_PHYSICS)/%.o: $(DIR_SRC_PHYSICS)/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ -c $<; echo "";
+	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ -c $<; \
+	echo "physics rule 2";
 #-------------------------------------------------------------	
 
 
@@ -49,7 +54,28 @@ $(DIR_BIN)/nbodies_visualizationOnly: $(OBJ_VISUALIZATION) $(DIR_BUILD_VISUALIZA
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
 
 $(DIR_BUILD_VISUALIZATION)/%.o: $(DIR_SRC_VISUALIZATION)/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; echo "";
+	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
+	echo "visualization rule 2";
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+#***
+# Experiments
+#***
+
+bin/exp%: build/__experiments/opengl%.o build/visualization/GLShader.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
+
+build/__experiments/%.o: src/__experiments/%.cpp
+	$(EXEC) $(NVCC) -I$(CUDA_PATH)/samples/common/inc $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
+	echo "experiment rule 2 cpp";
+
+build/__experiments/%.o: src/__experiments/%.cu
+	$(EXEC) $(NVCC) -I$(CUDA_PATH)/samples/common/inc $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
+	echo "experiment rule 3 cu";
+
 #-------------------------------------------------------------
 
 
@@ -65,7 +91,8 @@ bin/nbodies: $(OBJ_VISUALIZATION) $(OBJ_PHYSICS) build/main.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
 
 build/%.o: src/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; echo "";
+	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
+	echo "all rule 2";
 
 #-------------------------------------------------------------
 

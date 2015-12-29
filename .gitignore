@@ -3,5 +3,8 @@ bin/*
 .removed/*
 .projectsFiles/*
 *.o
-src/__experiments/*
 test.md
+
+doc/*.aux
+doc/*.toc
+doc/*.log

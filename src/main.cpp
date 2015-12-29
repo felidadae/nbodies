@@ -89,7 +89,7 @@ private:
 
 void _NBodies() {
 	unsigned D = 3;
-	unsigned N = 5;	
+	unsigned N = 100;	
 	unsigned stepsNum = 10;
 	Params<position_type> 	p_0(D,N);
 	Params<position_type>	v_0(D,N);
@@ -143,7 +143,6 @@ void _twoBodies() {
 
 	GLVisualization_NBodiesSystem nbodiesGLBridge(&nbodies, D, N);
 	
-
 	start(nbodiesGLBridge);
 }
 

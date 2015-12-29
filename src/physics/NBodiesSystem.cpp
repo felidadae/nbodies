@@ -1,9 +1,9 @@
 #include "NBodiesSystem.h"
-
+#include <cmath>
 
 
 const position_type NBodiesSystem::G = 1;
-const position_type NBodiesSystem::efactor = 0.001;
+const position_type NBodiesSystem::efactor = 0.1;
 
 NBodiesSystem::NBodiesSystem(
 	unsigned D, unsigned N, 
@@ -39,7 +39,7 @@ void NBodiesSystem::step_a () {
 					r_axis[d] * r_axis[d];
 			}
 
-			position_type a_scalar = G * m[0][j] / (r_squared + 0.5);
+			position_type a_scalar = G * m[0][j] / pow(r_squared + efactor, 1.5);
 
 			for (int d = 0; d < D; ++d)
 				a[d][i] = -1 * a_scalar * (r_axis[d]/r_squared);
@@ -58,6 +58,7 @@ void NBodiesSystem::step( time_type delta_t ) {
 			v_curr[d][i] = v_prev[d][i]  +  a[d][i] * delta_t;
 			p_curr[d][i] = p_prev[d][i]  +  
 				(v_prev[d][i] + v_curr[d][i]) * 0.5 * delta_t;
+			if (p_curr[d][i] > 1 || p_curr[d][i] < -1) v_curr[d][i] = -v_curr[d][i];
 		}
 
 	step_a();
