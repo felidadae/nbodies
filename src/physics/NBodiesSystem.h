@@ -6,6 +6,8 @@
 
 
 /*
+	@Description
+
 	@Abbreviations/naming scheme
 		@D <- dimensions count (2 for 2d, 3 for 3d, etc.)
 		@N <- bodies count
@@ -34,9 +36,9 @@ public:
 	static const position_type efactor;
 
 	NBodiesSystem(unsigned D, unsigned N, 
-		Params<position_type>& p_0,
-		Params<position_type>& v_0,
-		Params<mass_type>& m_0
+		Params<position_type>& 	p_0,
+		Params<position_type>& 	v_0,
+		Params<mass_type>& 		m_0
 	);
 	void step( time_type delta_t );
 	Params<position_type>* getPositions();
@@ -44,8 +46,11 @@ public:
 
 private:
 	unsigned D, N;
-	Params<position_type> p_prev, p_curr, v_prev, v_curr, a;
-	Params<mass_type> m;
+	Params<position_type> 	p_prev, p_curr,
+							v_prev, v_curr,
+							a;
+	Params<mass_type> 		m;
+
 	void step_a ();
 };
 

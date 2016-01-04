@@ -2,8 +2,6 @@
 #include "physics/NBodiesSystem.h"
 
 #include <cstdlib>
-
-
 /*
 	Random Number Generator for floating points number (float, double, etc)
 */
@@ -24,20 +22,18 @@ struct RandFloatingNumber {
 	}
 };
 
-/*
-	1 In the beginning, God created the heavens and the earth. 
-	2 The earth was without form and void, 
-	and darkness was over the face of the deep ...
-*/
 class God {
 public:
 	struct State {
-		State(Params<position_type>& 	p_0, 
-			Params<position_type>& 		v_0, 
-			Params<mass_type>&			m_0):
-				p_0(p_0), v_0(v_0), m_0(m_0) {}
-		Params<position_type>& 	p_0; 
-		Params<position_type>& 	v_0; 
+		State(
+			Params<position_type>& 	p_0, 
+			Params<position_type>& 	v_0, 
+			Params<mass_type>&		m_0
+		):	p_0(p_0), v_0(v_0), m_0(m_0) 
+		{}
+		
+		Params<position_type>& 	p_0;
+		Params<position_type>& 	v_0;
 		Params<mass_type>&		m_0;
 	};
 	struct Ranges {
@@ -59,24 +55,23 @@ public:
 		//rand position and speed
 		for (int d = 0; d < D; ++d)
 			for (int i = 0; i < N; ++i) {
-				state.p_0[d][i] = 
+				state.p_0.setVal(d, i, 
 					randgen_position.randInRange(
-						ranges.min__p_0, ranges.max__p_0, steps);
-				state.v_0[d][i] = 
+						ranges.min__p_0, ranges.max__p_0, steps));
+				state.v_0.setVal(d, i, 
 					randgen_position.randInRange(
-						ranges.min__v_0, ranges.max__v_0, steps);
+						ranges.min__v_0, ranges.max__v_0, steps));
 			}
 
 		for (int i = 0; i < N; ++i) {
-			state.p_0[2][i] = 0.0;
-			state.v_0[2][i] = 0.0;
+			state.p_0.setVal(2, i, 0.0);
+			state.v_0.setVal(2, i, 0.0);
 		}
 
 		//rand mass
 		for (int i = 0; i < N; ++i) {
-				state.m_0[0][i] = 
-					randgen_mass.randInRange(
-						ranges.min__m_0, ranges.max__m_0, steps);
+				state.m_0.setVal(0, i, randgen_mass.randInRange(
+						ranges.min__m_0, ranges.max__m_0, steps));
 		}
 	}
 
@@ -91,9 +86,9 @@ void _NBodies() {
 	unsigned D = 3;
 	unsigned N = 100;	
 	unsigned stepsNum = 10;
-	Params<position_type> 	p_0(D,N);
-	Params<position_type>	v_0(D,N);
-	Params<mass_type> 		m_0(1,N);
+	Params<position_type> 	p_0(D,N, ALIGN);
+	Params<position_type>	v_0(D,N, ALIGN);
+	Params<mass_type> 		m_0(1,N, ALIGN);
 
 	God god(D, N);
 	God::State state(p_0, v_0, m_0);
@@ -115,28 +110,28 @@ void _NBodies() {
 void _twoBodies() {
 	unsigned N = 2, D = 3;
 
-	Params<position_type> 	p_0(D,N);
-	Params<position_type>	v_0(D,N);
-	Params<mass_type> 		m_0(1,2);
+	Params<position_type> 	p_0(D,N, ALIGN);
+	Params<position_type>	v_0(D,N, ALIGN);
+	Params<mass_type> 		m_0(1,2, ALIGN);
 
-	m_0[0][0] = 1;
-	m_0[0][1] = 1;
+	m_0.setVal(0, 0, 1);
+	m_0.setVal(0, 1, 1);
 
-	p_0[X][0] = -0.8;
-	p_0[Y][0] = -0.8;
-	p_0[Z][0] = 0;
+	p_0.setVal(X, 0, -0.8);
+	p_0.setVal(Y, 0, -0.8);
+	p_0.setVal(Z, 0, 0);
 	//-
-	p_0[X][1] = 0.8;
-	p_0[Y][1] = 0.8;
-	p_0[Z][1] = 0;
+	p_0.setVal(X, 1, 0.8);
+	p_0.setVal(Y, 1, 0.8);
+	p_0.setVal(Z, 1, 0);
 
-	v_0[X][0] = 0.1;
-	v_0[Y][0] = 0;
-	v_0[Z][0] = 0;
+	v_0.setVal(X, 0, 0.1);
+	v_0.setVal(Y, 0, 0);
+	v_0.setVal(Z, 0, 0);
 	//-
-	v_0[X][1] = -0.1;
-	v_0[Y][1] = 0;
-	v_0[Z][1] = 0;
+	v_0.setVal(X, 1, -0.1);
+	v_0.setVal(Y, 1, 0);
+	v_0.setVal(Z, 1, 0);
 
 	NBodiesSystem nbodies( D, N, p_0, v_0, m_0);
 	// nbodies.step(delta_t);

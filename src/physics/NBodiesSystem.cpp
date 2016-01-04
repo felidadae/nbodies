@@ -11,9 +11,9 @@ NBodiesSystem::NBodiesSystem(
 	Params<position_type>& v_0,
 	Params<mass_type>& m_0
 	):
-		p_prev(D, N), p_curr(D, N), 
-		v_prev(D, N), v_curr(D, N),
-		a(D, N), m(1, N)	
+		p_prev(D, N, ALIGN), p_curr(D, N, ALIGN), 
+		v_prev(D, N, ALIGN), v_curr(D, N, ALIGN),
+		a(D, N, ALIGN), m(1, N, ALIGN)	
 {
 	this->D = D;
 	this->N = N;
@@ -34,15 +34,15 @@ void NBodiesSystem::step_a () {
 			position_type* r_axis = new position_type[D];
 			position_type r_squared = 0;
 			for (int d = 0; d < D; ++d) {
-				r_axis[d] = (p_curr[d][i] - p_curr[d][j]);
+				r_axis[d] = (p_curr.getVal(d, i) - p_curr.getVal(d, j));
 				r_squared += 
 					r_axis[d] * r_axis[d];
 			}
 
-			position_type a_scalar = G * m[0][j] / pow(r_squared + efactor, 1.5);
+			position_type a_scalar = G * m.getVal(0, j) / pow(r_squared + efactor, 1.5);
 
 			for (int d = 0; d < D; ++d)
-				a[d][i] = -1 * a_scalar * (r_axis[d]/r_squared);
+				a.setVal(d, i, -1 * a_scalar * (r_axis[d]/r_squared));
 
 			delete [] r_axis;
 		}
@@ -55,10 +55,10 @@ void NBodiesSystem::step( time_type delta_t ) {
 
 	for (int d = 0; d < D; ++d)
 		for (int i = 0; i < N; ++i) {
-			v_curr[d][i] = v_prev[d][i]  +  a[d][i] * delta_t;
-			p_curr[d][i] = p_prev[d][i]  +  
-				(v_prev[d][i] + v_curr[d][i]) * 0.5 * delta_t;
-			if (p_curr[d][i] > 1 || p_curr[d][i] < -1) v_curr[d][i] = -v_curr[d][i];
+			v_curr.setVal(d, i, v_prev.getVal(d, i)  +  a.getVal(d, i) * delta_t);
+			p_curr.setVal(d, i, p_prev.getVal(d, i)  +  (v_prev.getVal(d, i) + v_curr.getVal(d, i)) * 0.5 * delta_t);
+			if (p_curr.getVal(d, i) > 1 || p_curr.getVal(d, i) < -1) 
+				v_curr.setVal(d, i, -v_curr.getVal(d, i));
 		}
 
 	step_a();

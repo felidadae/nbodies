@@ -1,9 +1,7 @@
-#ifndef N_BODIES_SYSTEM_PARAMS_HEADER
-#define N_BODIES_SYSTEM_PARAMS_HEADER
+#ifndef N_BODIES_SYSTEM_IPARAMS_HEADER
+#define N_BODIES_SYSTEM_IPARAMS_HEADER
 
 #include <iostream>
-
-
 
 typedef float position_type;
 typedef float mass_type;
@@ -13,76 +11,119 @@ static const int X = 0;
 static const int Y = 1;
 static const int Z = 2;
 
+#define INTERLEAVED Params<position_type>::Interleaved
+#define SEPERATED Params<position_type>::Seperated
+#define CHOOSEN_DATA_ALIGNMENT SEPERATED
+#define ALIGN CHOOSEN_DATA_ALIGNMENT
+
 
 
 /*
-	@Abbreviations/naming scheme
-		@D <- dimensions count (2 for 2d, 3 for 3d, etc.)
-		@N <- bodies count
-
-	@Description:
-		data is kept as dynamically alocated array;
-			[all data from dimension 0] [all data from dimension 1] ...
-		to focus only on one dimension use [] operator 
-			e.g. 
-			Params<float> position(3, 5); 
-			position[DIM=2][ELEMENT=3];
+	@Description:	
+		Two dimensional container, which can store data in two ways,
+			or as x0 y0 z0 ... x1 y1 z1 ...
+			or as x0 x1 x2 x3 x4 ... y0 y1 y2 y3 y4 ... z0 z1 z2 z3 z4 ... ......
 */
-template<typename T>
+template <typename T>
 class Params {
 public:
-	T* data;
-	unsigned getD() const { return D; }
-	unsigned getN() const { return N; }
-	Params(unsigned D, unsigned N);
-	~Params();
-	inline 			T* operator [] (unsigned d);
-	inline void operator = (Params& other);
+	enum StorageMethod {
+		Seperated,
+		Interleaved
+	};
+	Params(int D, int N, StorageMethod storageMethod);
+	Params(const Params& other);
+	const Params& operator = (const Params& other);
+
+	inline unsigned getD() const;
+	inline unsigned getN() const;
+	inline StorageMethod getStorageMethod() const;
+
+	inline T 		getVal(unsigned dimIdx, unsigned elementIdx) const;
+	inline void 	setVal(unsigned dimIdx, unsigned elementIdx, T value);
+
 	inline void setAllElementsTo (T value);
+	inline void printAllElements () const;
+
 private:
-	unsigned D, N;
+	int D, N;
+	StorageMethod storageMethod;
+	T* data;
 };
 
-template<typename T>
-std::ostream &
-	operator<<(std::ostream &os, Params<T> &p) 
-{ 
-	for (int d = 0; d < p.getD(); ++d) {
-		os << "dim: " << d << std::endl << "\t";
-		for (int i = 0; i < p.getN(); ++i)
-			os << p[d][i] << " ";
-		os << std::endl;
+
+
+
+template <typename T>
+Params<T>::Params(int D, int N, StorageMethod storageMethod) {  
+	data = new T[D*N]; 
+	this->D = D; 
+	this->N = N; 
+	this->storageMethod = storageMethod;
+}
+
+template <typename T>
+Params<T>::Params(const Params<T>& other) {  
+	data = new T[other.getD()*other.getN()]; 
+	this->D = other.D; 
+	this->N = other.N; 
+	this->storageMethod = other.storageMethod;
+}
+
+template <typename T>
+const Params<T>& Params<T>::operator = (const Params<T>& other) {
+	for (int d = 0; d < D; ++d)
+	{
+		for (int i = 0; i < N; ++i)
+		{
+			setVal(d, i, other.getVal(d, i));
+		}
 	}
-    return os;
 }
 
-template<typename T>
-Params<T>::Params(unsigned D, unsigned N) {
-	data = new T[N*D];
-	this->D = D;
-	this->N = N;
-}
-template<typename T>
-Params<T>::~Params() {
-	delete[] data;
-}
-template<typename T>
-T* Params<T>::operator [] (unsigned d) {
-	return data + (d * N); 
-}
-template<typename T>
-void Params<T>::operator = (Params& other) {
-	for (int d = 0; d < D; ++d)
-		for (int i = 0; i < N; ++i)
-			(*this)[d][i] = other[d][i];
-}
-template<typename T>
-void Params<T>::setAllElementsTo (T value) {
-	for (int d = 0; d < D; ++d)
-		for (int i = 0; i < N; ++i)
-			(*this)[d][i] = value;
+template <typename T>
+unsigned Params<T>::getD() const {
+	return this->D;
 }
 
+template <typename T>
+unsigned Params<T>::getN() const {
+	return this->N;
+}
 
+template <typename T>
+typename Params<T>::StorageMethod Params<T>::getStorageMethod() const {
+	return this->storageMethod;
+}
+
+template <typename T>
+T 	 Params<T>::getVal(unsigned dimIdx, unsigned elementIdx) const {
+	if (this->storageMethod == Params<T>::Interleaved)
+		return this->data[elementIdx*D + dimIdx];
+	else
+		return this->data[dimIdx*N + elementIdx];
+}
+
+template <typename T>
+void Params<T>::setVal(unsigned dimIdx, unsigned elementIdx, T value) 		{
+	if (this->storageMethod == Params<T>::Interleaved)
+		this->data[elementIdx*D + dimIdx] = value;
+	else
+		this->data[dimIdx*N + elementIdx] = value;
+}
+
+template <typename T>
+void Params<T>::setAllElementsTo(T value) {
+	for (int i = 0; i < N*D; ++i)
+		this->data[i] = value;
+}
+
+template <typename T>
+void Params<T>::printAllElements () const { 
+	std::cout << "Printing: ";
+	for (int i = 0; i < D*N; ++i)
+		std::cout << data[i] << " ";
+	std::cout << "\n";
+}
 
 #endif

@@ -22,7 +22,7 @@ public:
 		for (int i = 0; i < N; ++i)
 			for (int d = 0; d < D; ++d) {
 				points[ipoints++] = 
-					(*model_positions)[d][i];
+					(*model_positions).getVal(d, i);
 			}
 		 
 		 // for (int i = 0; i < N*D; ++i) {

@@ -19,6 +19,22 @@ doc/report.pdf: doc/report.tex
 
 #-------------------------------------------------------------
 #***
+# Class tests
+#***
+CLASS_TEST_FLAG := -DCLASS_TEST
+
+#Params
+bin/.tests/test__params: build/.testsfiles/test__params.o
+	$(EXEC) $(NVCC) $(ALL_CCFLAGS) -o $@ $+
+build/.testsfiles/test__params.o: src/physics/test__params.cpp
+	$(EXEC) $(NVCC) $(CLASS_TEST_FLAG) $(ALL_CCFLAGS) -o $@ -c $<; \
+	echo "Class tests Params";
+#-------------------------------------------------------------
+
+
+
+#-------------------------------------------------------------
+#***
 # PHYSICS ONLY
 #***
 
