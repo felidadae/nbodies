@@ -22,6 +22,7 @@ struct RandFloatingNumber {
 	}
 };
 
+
 class God {
 public:
 	struct State {
@@ -58,9 +59,9 @@ public:
 				state.p_0.setVal(d, i, 
 					randgen_position.randInRange(
 						ranges.min__p_0, ranges.max__p_0, steps));
-				state.v_0.setVal(d, i, 
-					randgen_position.randInRange(
-						ranges.min__v_0, ranges.max__v_0, steps));
+				// state.v_0.setVal(d, i, 
+				// 	randgen_position.randInRange(
+				// 		ranges.min__v_0, ranges.max__v_0, steps));
 			}
 
 		for (int i = 0; i < N; ++i) {
@@ -84,8 +85,8 @@ private:
 
 void _NBodies() {
 	unsigned D = 3;
-	unsigned N = 100;	
-	unsigned stepsNum = 10;
+	unsigned N = 100;
+	unsigned stepsNum = 30;
 	Params<position_type> 	p_0(D,N, ALIGN);
 	Params<position_type>	v_0(D,N, ALIGN);
 	Params<mass_type> 		m_0(1,N, ALIGN);
@@ -93,10 +94,10 @@ void _NBodies() {
 	God god(D, N);
 	God::State state(p_0, v_0, m_0);
 	God::Ranges ranges;
-	ranges.min__p_0 = -1;
-	ranges.max__p_0 =  1;
-	ranges.min__v_0 = -0.3;
-	ranges.max__v_0 =  0.3;
+	ranges.min__p_0 = -1.5;
+	ranges.max__p_0 =  1.5;
+	ranges.min__v_0 = -0.01;
+	ranges.max__v_0 = 0.01;
 	ranges.min__m_0 =  0.5;
 	ranges.max__m_0 =  2;
 
@@ -115,21 +116,21 @@ void _twoBodies() {
 	Params<mass_type> 		m_0(1,2, ALIGN);
 
 	m_0.setVal(0, 0, 1);
-	m_0.setVal(0, 1, 1);
+	m_0.setVal(0, 1, 100);
 
-	p_0.setVal(X, 0, -0.8);
-	p_0.setVal(Y, 0, -0.8);
+	p_0.setVal(X, 0, -0.4);
+	p_0.setVal(Y, 0, -0.4);
 	p_0.setVal(Z, 0, 0);
 	//-
-	p_0.setVal(X, 1, 0.8);
-	p_0.setVal(Y, 1, 0.8);
+	p_0.setVal(X, 1, 0.4);
+	p_0.setVal(Y, 1, 0.4);
 	p_0.setVal(Z, 1, 0);
 
-	v_0.setVal(X, 0, 0.1);
+	v_0.setVal(X, 0, 5.7);
 	v_0.setVal(Y, 0, 0);
 	v_0.setVal(Z, 0, 0);
 	//-
-	v_0.setVal(X, 1, -0.1);
+	v_0.setVal(X, 1, -5.7);
 	v_0.setVal(Y, 1, 0);
 	v_0.setVal(Z, 1, 0);
 

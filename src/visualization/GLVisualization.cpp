@@ -114,7 +114,7 @@ void start (GLVisualization_NBodiesSystem& nbodiesGLBridge) {
 
 	while (!glfwWindowShouldClose (window)) {
 		float deltaTime = elapsedTime();
-		nbodiesGLBridge.stepPositions(deltaTime/5.0);
+		nbodiesGLBridge.stepPositions(deltaTime/500.0);
 		glClearColor(1,1,1,1);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram (shader_programme);

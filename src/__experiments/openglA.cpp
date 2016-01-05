@@ -31,9 +31,6 @@ struct Points {
 	void 	set(int directionDim, int pointDim, GLfloat value) 	{ data[directionDim+ pointDim*3] = value;  }
 };
 
-class Circle {
-	draw();
-};
 
 /*
 	create 2D circle, point[Z] == 0 for each point, where Z==2

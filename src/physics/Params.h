@@ -53,7 +53,6 @@ private:
 
 
 
-
 template <typename T>
 Params<T>::Params(int D, int N, StorageMethod storageMethod) {  
 	data = new T[D*N]; 
@@ -64,7 +63,10 @@ Params<T>::Params(int D, int N, StorageMethod storageMethod) {
 
 template <typename T>
 Params<T>::Params(const Params<T>& other) {  
-	data = new T[other.getD()*other.getN()]; 
+	data = new T[other.D*other.N];
+	for (int i; i<other.D*other.N; ++i) {
+		data[i] = other.data[i];
+	}
 	this->D = other.D; 
 	this->N = other.N; 
 	this->storageMethod = other.storageMethod;
@@ -79,6 +81,7 @@ const Params<T>& Params<T>::operator = (const Params<T>& other) {
 			setVal(d, i, other.getVal(d, i));
 		}
 	}
+	return *this;
 }
 
 template <typename T>
@@ -124,6 +127,21 @@ void Params<T>::printAllElements () const {
 	for (int i = 0; i < D*N; ++i)
 		std::cout << data[i] << " ";
 	std::cout << "\n";
+}
+
+
+
+template<typename T>
+std::ostream &
+	operator<<(std::ostream &os, Params<T> &p) 
+{ 
+	for (int d = 0; d < p.getD(); ++d) {
+		os << "dim: " << d << std::endl << "\t";
+		for (int i = 0; i < p.getN(); ++i)
+			os << p.getVal(d, i) << " ";
+		os << std::endl;
+	}
+    return os;
 }
 
 #endif
