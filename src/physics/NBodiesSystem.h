@@ -2,6 +2,7 @@
 #define N_BODIES_SYSTEM_HEADER
 
 #include "Params.h"
+#define DEBUG_PRINT_POINTS_POSITIONS
 
 
 
@@ -42,7 +43,10 @@ public:
 	);
 	void step( time_type delta_t );
 	Params<position_type>* getPositions();
-	void printPositions();
+
+	#ifdef DEBUG_PRINT_POINTS_POSITIONS
+	void printState();
+	#endif
 
 private:
 	unsigned D, N;

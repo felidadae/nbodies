@@ -22,7 +22,6 @@ struct RandFloatingNumber {
 	}
 };
 
-
 class God {
 public:
 	struct State {
@@ -85,7 +84,7 @@ private:
 
 void _NBodies() {
 	unsigned D = 3;
-	unsigned N = 100;
+	unsigned N = 10;
 	unsigned stepsNum = 30;
 	Params<position_type> 	p_0(D,N, ALIGN);
 	Params<position_type>	v_0(D,N, ALIGN);
@@ -94,8 +93,8 @@ void _NBodies() {
 	God god(D, N);
 	God::State state(p_0, v_0, m_0);
 	God::Ranges ranges;
-	ranges.min__p_0 = -1.5;
-	ranges.max__p_0 =  1.5;
+	ranges.min__p_0 = -0.1;
+	ranges.max__p_0 =  0.1;
 	ranges.min__v_0 = -0.01;
 	ranges.max__v_0 = 0.01;
 	ranges.min__m_0 =  0.5;

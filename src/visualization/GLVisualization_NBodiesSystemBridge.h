@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+
+
 class GLVisualization_NBodiesSystem {
 public:
 	GLfloat* points;
@@ -24,11 +26,6 @@ public:
 				points[ipoints++] = 
 					(*model_positions).getVal(d, i);
 			}
-		 
-		 // for (int i = 0; i < N*D; ++i) {
-		 // 	printf("POINTS %f \n", points[i]);
-		 // }
-		 // printf("POINTS %d \n\n\n", N);
 	}
 
 	GLVisualization_NBodiesSystem(
