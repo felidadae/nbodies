@@ -24,9 +24,9 @@ doc/report.pdf: doc/report.tex
 CLASS_TEST_FLAG := -DCLASS_TEST
 
 #Params
-bin/.tests/test__params: build/.testsfiles/test__params.o
+bin/.tests/test__Params: build/.testsfiles/test__Params.o
 	$(EXEC) $(NVCC) $(ALL_CCFLAGS) -o $@ $+
-build/.testsfiles/test__params.o: src/physics/test__params.cpp
+build/.testsfiles/test__Params.o: src/physics/test__Params.cpp
 	$(EXEC) $(NVCC) $(CLASS_TEST_FLAG) $(ALL_CCFLAGS) -o $@ -c $<; \
 	echo "Class tests Params";
 #-------------------------------------------------------------
@@ -46,7 +46,7 @@ OBJ_PHYSICS := $(SRC_PHYSICS:$(DIR_SRC_PHYSICS)/%.cpp=$(DIR_BUILD_PHYSICS)/%.o)
 
 physics-only: $(DIR_BIN)/nbodies_physicsOnly
 
-$(DIR_BIN)/nbodies_physicsOnly: $(OBJ_PHYSICS) $(DIR_BUILD_PHYSICS)/test__physics.o
+$(DIR_BIN)/nbodies_physicsOnly: $(OBJ_PHYSICS) $(DIR_BUILD_PHYSICS)/test__NBodiesSystem.o
 	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ $+
 
 $(DIR_BUILD_PHYSICS)/%.o: $(DIR_SRC_PHYSICS)/%.cpp
