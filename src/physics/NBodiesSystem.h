@@ -55,7 +55,6 @@ private:
 							a;
 	Params<mass_type> 		m;
 
-	void step_a ();
 };
 
 #endif

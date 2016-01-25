@@ -1,8 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "GLVisualization_NBodiesSystemBridge.h"
+#include "GLBridgeInterface.h"
 
-void start(GLVisualization_NBodiesSystem& visualizationBridge);
+void start(GLBridgeInterface* glbridge, int maxiter = -1);
 
 #endif

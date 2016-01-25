@@ -17,8 +17,6 @@
 
 
 
-
-
 double elapsedTime() {
 	static double previous_seconds = glfwGetTime ();
 	double current_seconds = glfwGetTime ();
@@ -47,7 +45,7 @@ void updateWindoWFPSCounter (GLFWwindow* window) {
 
 
 
-void start (GLVisualization_NBodiesSystem& nbodiesGLBridge) {
+void start (GLBridgeInterface* glbridge, int maxiter) {
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit ()) {
 		fprintf (stderr, "ERROR: could not start GLFW3\n");
@@ -100,7 +98,7 @@ void start (GLVisualization_NBodiesSystem& nbodiesGLBridge) {
 
 	
 	//--------------------------------------------------------
-	nbodiesGLBridge.initOpenGLPart();
+	glbridge->initOpenGLPart();
 
 	GLuint shader_programme = 
 		LoadShader(
@@ -111,18 +109,21 @@ void start (GLVisualization_NBodiesSystem& nbodiesGLBridge) {
 	GLuint MatrixID = glGetUniformLocation(shader_programme, "MVP");
 	//--------------------------------------------------------
 
-
+	int iiter = 0;
 	while (!glfwWindowShouldClose (window)) {
 		float deltaTime = elapsedTime();
-		nbodiesGLBridge.stepPositions(deltaTime/500.0);
-		glClearColor(1,1,1,1);
+		glbridge->stepPositions(deltaTime/10.0);
+		glClearColor(0.0,0.3,0.0,0.2);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram (shader_programme);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 		glPointSize(10);
-		glDrawArrays (GL_POINTS, 0, nbodiesGLBridge.getN());
+		glDrawArrays (GL_POINTS, 0, glbridge->getN());
 		glfwPollEvents ();
 		glfwSwapBuffers (window);
+
+		++iiter;
+		if (iiter == maxiter) return;
 	}
 
 	// close GL context and any other GLFW resources

@@ -23,11 +23,34 @@ NBodiesSystem::NBodiesSystem(
 	v_curr = v_0;
 	m = m_0;
 
-	step_a();
+	for (int d = 0; d < D; ++d)
+		for (int i = 0; i < N; ++i)
+			a.setVal(d, i, 0.0f);
 }
 
-void NBodiesSystem::step_a () {
+
+void NBodiesSystem::step( time_type delta_t ) {
+	p_prev = p_curr;
+	v_prev = v_curr;
+
+	//--------------------------------------------------------------
 	/*
+		UPDATE v SPEED and p POSITION
+	*/
+
+	for (int d = 0; d < D; ++d)
+		for (int i = 0; i < N; ++i) {
+			v_curr.setVal(d, i, v_prev.getVal(d, i)  +  a.getVal(d, i) * delta_t);
+			p_curr.setVal(d, i, p_prev.getVal(d, i)  +  (v_prev.getVal(d, i) + v_curr.getVal(d, i)) * 0.5 * delta_t);
+			if (p_curr.getVal(d, i) > 1 || p_curr.getVal(d, i) < -1) 
+				v_curr.setVal(d, i, -v_curr.getVal(d, i));
+		}
+	//--------------------------------------------------------------
+	
+
+	//--------------------------------------------------------------
+	/*
+		UPDATE a ACCELERATION
 		For each two bodies i,j where i != j;
 	*/
 
@@ -50,7 +73,8 @@ void NBodiesSystem::step_a () {
 				r_squared += r_axis[d] * r_axis[d];
 			}
 
-			position_type a_scalar = G * m.getVal(0, j) / pow(r_squared + efactor, 1.5);
+			position_type a_scalar = 
+				G * m.getVal(0, j) / pow(r_squared + efactor, 1.5);
 
 			for (int d = 0; d < D; ++d) {
 				/*
@@ -58,9 +82,12 @@ void NBodiesSystem::step_a () {
 					there is division by zero; what to do then?
 				 	I just set then acceleration to 0;
 				*/
-				if (!r_axis[d]) continue;	
-				
-				a.setVal(d, i, a.getVal(d,i) - 1 * a_scalar * (r_axis[d]/sqrt(r_squared)));
+				if (r_axis[d]) {
+					a.setVal(d, i, 
+						a.getVal(d,i) - 
+							a_scalar * 
+							(r_axis[d]/sqrt(r_squared)));
+				}	
 			}
 
 			if ( a.getVal(X, i) !=  a.getVal(X, i)) {
@@ -71,21 +98,7 @@ void NBodiesSystem::step_a () {
 			delete [] r_axis;
 		}
 	}
-}
-
-void NBodiesSystem::step( time_type delta_t ) {
-	p_prev = p_curr;
-	v_prev = v_curr;
-
-	for (int d = 0; d < D; ++d)
-		for (int i = 0; i < N; ++i) {
-			v_curr.setVal(d, i, v_prev.getVal(d, i)  +  a.getVal(d, i) * delta_t);
-			p_curr.setVal(d, i, p_prev.getVal(d, i)  +  (v_prev.getVal(d, i) + v_curr.getVal(d, i)) * 0.5 * delta_t);
-			if (p_curr.getVal(d, i) > 1 || p_curr.getVal(d, i) < -1) 
-				v_curr.setVal(d, i, -v_curr.getVal(d, i));
-		}
-
-	step_a();
+	//--------------------------------------------------------------
 
 	#ifdef DEBUG_PRINT_POINTS_POSITIONS
 	printState();
@@ -99,23 +112,23 @@ Params<position_type>* NBodiesSystem::getPositions() {
 #ifdef DEBUG_PRINT_POINTS_POSITIONS
 void NBodiesSystem::printState() {
 	for (int i = 0; i < N; ++i) {
-		printf("Body(%d): \n", i);
+		printf("CPU_Body(%d): \n", i);
 		
 		printf("\t p <- (");
 		for (int d = 0; d < D; ++d)
-			printf("%2.f ", p_curr.getVal(d, i));
+			printf("%f ", p_curr.getVal(d, i));
 		printf(")\n");
 
 		printf("\t v <- (");
 		for (int d = 0; d < D; ++d)
-			printf("%2.f ", v_curr.getVal(d, i));
+			printf("%f ", v_curr.getVal(d, i));
 		printf(")\n");
 
 		printf("\t a <- (");
 		for (int d = 0; d < D; ++d)
-			printf("%2.f ", a.getVal(d, i));
+			printf("%f ", a.getVal(d, i));
 		printf(")\n");
 	}
-	printf("\n\n\n");
+	printf("\n");
 }
 #endif

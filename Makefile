@@ -1,128 +1,114 @@
-
-
-
-
 #-------------------------------------------------------------
 include cuda.md
 include opengl.md
 
 DIR_BIN := bin
+DIR_BUILD := build
 SHELL := /bin/bash
 
-all: nbodies
-doc: doc/report.pdf
-doc/report.pdf: doc/report.tex
-	pdflatex doc/report.tex
+FLAGS := $(ALL_LDFLAGS) $(GENCODE_FLAGS)
+INCLUDE := -I$(CUDA_PATH)/samples/common/inc $(INCLUDES_OPENGL)
+LIBRARIES += $(LIBRARIES_OPENGL)
+COMPILER := $(EXEC) $(NVCC)
+
+# When you want also to compile 
+# main funtion in a test source file;
+CLASS_TEST_FLAG := -DCLASS_TEST
 #-------------------------------------------------------------
 
+
+#-------------------------------------------------------------
+#***
+# Documentation
+#***
+doc: doc/report.pdf
+doc/report.pdf: doc/report.tex
+	cd doc; pdflatex doc/report.tex
+#-------------------------------------------------------------
+
+
+#-------------------------------------------------------------
+#***
+# How to build any objective file
+#***
+
+BUILDA := $(COMPILER) $(INCLUDE) $(ALL_LDFLAGS) $(GENCODE_FLAGS) 
+
+echoSettings:
+	$(COMPILER) \
+	$(INCLUDE)
+
+build/test__%.o: src/physics/test__%.cpp
+	$(BUILDA) $(CLASS_TEST_FLAG) -o $@ -c $<
+
+build/%.o: src/physics/%.cu
+	$(BUILDA) -o $@ -c $<
+
+build/%.o: src/physics/%.cpp
+	$(BUILDA) -o $@ -c $<
+
+build/%.o: src/visualization/%.cpp
+	$(BUILDA) -o $@ -c $<
+
+build/%.o: src/%.cpp
+	$(BUILDA) -o $@ -c $<
+
+
+build/%.o: src/__experiments/%.cpp
+	$(BUILDA) -o $@ -c $<
+build/%.o: src/__experiments/%.cu
+	$(BUILDA) -o $@ -c $<
+
+#-------------------------------------------------------------
 
 
 #-------------------------------------------------------------
 #***
 # Class tests
 #***
-CLASS_TEST_FLAG := -DCLASS_TEST
+
+#experiments
+bin/exp%: build/opengl%.o build/GLShader.o
+	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
+
 
 #Params
-bin/.tests/test__Params: build/.testsfiles/test__Params.o
-	$(EXEC) $(NVCC) $(ALL_CCFLAGS) -o $@ $+
-build/.testsfiles/test__Params.o: src/physics/test__Params.cpp
-	$(EXEC) $(NVCC) $(CLASS_TEST_FLAG) $(ALL_CCFLAGS) -o $@ -c $<; \
-	echo "Class tests Params";
+bin/test__Params: build/test__Params.o
+	$(COMPILER) $(ALL_CCFLAGS) -o $@ $+ $(LIBRARIES)
+
+#InitialState
+bin/test__InitialState: build/test__InitialState.o build/InitialState.o
+	$(COMPILER) $(ALL_CCFLAGS) -o $@ $+ $(LIBRARIES)
+
+#NBodiesSystemCUDA
+bin/test__NBodiesSystemCUDA: build/test__NBodiesSystemCUDA.o build/NBodiesSystemCUDA.o build/NBodiesSystem.o build/InitialState.o
+	$(COMPILER) $(ALL_CCFLAGS) -o $@ $+ $(LIBRARIES)
 #-------------------------------------------------------------
-
-
-
-#-------------------------------------------------------------
-#***
-# PHYSICS ONLY
-#***
-
-DIR_SRC_PHYSICS := src/physics
-DIR_BUILD_PHYSICS := build/physics
-INCLUDE_PHYSICS :=
-SRC_PHYSICS := $(shell find $(DIR_SRC_PHYSICS) -type f -name '*.cpp' | perl -ne 'print if $$_ !~ /test/' )
-OBJ_PHYSICS := $(SRC_PHYSICS:$(DIR_SRC_PHYSICS)/%.cpp=$(DIR_BUILD_PHYSICS)/%.o)
-
-physics-only: $(DIR_BIN)/nbodies_physicsOnly
-
-$(DIR_BIN)/nbodies_physicsOnly: $(OBJ_PHYSICS) $(DIR_BUILD_PHYSICS)/test__NBodiesSystem.o
-	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ $+
-
-$(DIR_BUILD_PHYSICS)/%.o: $(DIR_SRC_PHYSICS)/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDE_PHYSICS) $(ALL_CCFLAGS) -o $@ -c $<; \
-	echo "physics rule 2";
-#-------------------------------------------------------------	
-
 
 
 #-------------------------------------------------------------
 #***
-# VISUALIZATION
+# allCPU allCUDA
 #***
 
-DIR_SRC_VISUALIZATION := src/visualization
-DIR_BUILD_VISUALIZATION := build/visualization
-SRC_VISUALIZATION := $(shell find $(DIR_SRC_VISUALIZATION) -type f -name '*.cpp' | perl -ne 'print if $$_ !~ /test/')
-OBJ_VISUALIZATION := $(SRC_VISUALIZATION:$(DIR_SRC_VISUALIZATION)/%.cpp=$(DIR_BUILD_VISUALIZATION)/%.o)
+allCPU: bin/allCPU
+bin/allCPU: build/main.o build/InitialState.o build/NBodiesSystem.o build/GLVisualization.o build/GLShader.o
+	$(COMPILER) $(FLAGS) -o $@ $+ $(LIBRARIES)
 
-$(DIR_BIN)/nbodies_visualizationOnly: $(OBJ_VISUALIZATION) $(DIR_BUILD_VISUALIZATION)/test__visualization.o
-	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
-
-$(DIR_BUILD_VISUALIZATION)/%.o: $(DIR_SRC_VISUALIZATION)/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
-	echo "visualization rule 2";
+allCUDA: bin/allCUDA
+bin/allCUDA: build/mainCUDA.o build/InitialState.o build/NBodiesSystemCUDA.o build/GLVisualization.o build/GLShader.o
+	$(COMPILER) $(FLAGS) -o $@ $+ $(LIBRARIES)
 #-------------------------------------------------------------
-
 
 
 #-------------------------------------------------------------
 #***
-# Experiments
-#***
-
-bin/exp%: build/__experiments/opengl%.o build/visualization/GLShader.o
-	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
-
-build/__experiments/%.o: src/__experiments/%.cpp
-	$(EXEC) $(NVCC) -I$(CUDA_PATH)/samples/common/inc $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
-	echo "experiment rule 2 cpp";
-
-build/__experiments/%.o: src/__experiments/%.cu
-	$(EXEC) $(NVCC) -I$(CUDA_PATH)/samples/common/inc $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
-	echo "experiment rule 3 cu";
-
-#-------------------------------------------------------------
-
-
-
-#-------------------------------------------------------------
-#***
-# ALL
-#***
-
-nbodies: bin/nbodies
-
-bin/nbodies: $(OBJ_VISUALIZATION) $(OBJ_PHYSICS) build/main.o
-	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES) $(LIBRARIES_OPENGL)
-
-build/%.o: src/%.cpp
-	$(EXEC) $(NVCC) $(INCLUDES_OPENGL) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ -c $<; \
-	echo "all rule 2";
-
-#-------------------------------------------------------------
-
-
-
-#-------------------------------------------------------------
-#***
-.PHONY: clean physics-only visualization-only
+.PHONY: clean doc allCPU allCUDA echoSettings
 
 clean:
-	rm $(DIR_BUILD_VISUALIZATION)/*; rm $(DIR_BUILD_PHYSICS)/*; rm $(DIR_BIN)/*; \
-	rm build/*.o; rm build/physics/*; rm build/visualization/*;
+	rm -r $(DIR_BIN)/*; rm -r $(DIR_BUILD)/*;
 
-.PRECIOUS: $(DIR_BUILD_VISUALIZATION)/%.o $(DIR_BUILD_PHYSICS)/%.o
+.PRECIOUS: $(DIR_BIN)/%.o $(DIR_BUILD)/%.o
 #***
 #-------------------------------------------------------------
 

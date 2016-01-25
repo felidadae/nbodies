@@ -1,7 +1,8 @@
 #include "Params.h"
 
 
-void test__params() {
+
+void test__Params() {
 	Params<position_type> p_seperated  (2,2, Params<position_type>::Interleaved);
 	Params<position_type> p_interleaved(2,2, Params<position_type>::Seperated  );
 
@@ -28,7 +29,7 @@ void test__params() {
 #ifdef CLASS_TEST
 int main(int argc, char const *argv[])
 {
-	test__params();
+	test__Params();
 	return 0;
 }
 #endif

@@ -3,18 +3,20 @@
 
 #include <iostream>
 
-typedef float position_type;
-typedef float mass_type;
-typedef double time_type;
+#include "../types.h"
 
 static const int X = 0;
 static const int Y = 1;
 static const int Z = 2;
 
 #define INTERLEAVED Params<position_type>::Interleaved
+#define INTERLEAVED_INT 1
 #define SEPERATED Params<position_type>::Seperated
+#define SEPERATED_INT 0
 #define CHOOSEN_DATA_ALIGNMENT SEPERATED
+
 #define ALIGN CHOOSEN_DATA_ALIGNMENT
+#define ALIGN_INT 0
 
 
 
@@ -28,8 +30,8 @@ template <typename T>
 class Params {
 public:
 	enum StorageMethod {
-		Seperated,
-		Interleaved
+		Seperated   = 0,
+		Interleaved = 1
 	};
 	Params(int D, int N, StorageMethod storageMethod);
 	Params(const Params& other);
@@ -39,22 +41,35 @@ public:
 	inline unsigned getN() const;
 	inline StorageMethod getStorageMethod() const;
 
-	inline T 		getVal(unsigned dimIdx, unsigned elementIdx) const;
-	inline void 	setVal(unsigned dimIdx, unsigned elementIdx, T value);
+	inline T getVal(
+		unsigned dimIdx, 
+		unsigned elementIdx) const;
+	inline void setVal(
+		unsigned dimIdx, 
+		unsigned elementIdx, 
+		T value);
 
 	inline void setAllElementsTo (T value);
-	inline void printAllElements () const;
+	inline void printAllElements (
+		std::string name = "this") const;
+
+	/*
+		CUDA versions needs pointer to data;
+	*/
+	T* data;
 
 private:
 	int D, N;
 	StorageMethod storageMethod;
-	T* data;
 };
 
 
 
 template <typename T>
-Params<T>::Params(int D, int N, StorageMethod storageMethod) {  
+Params<T>::Params(
+	int D, int N, 
+	StorageMethod storageMethod) 
+{  
 	data = new T[D*N]; 
 	this->D = D; 
 	this->N = N; 
@@ -64,7 +79,7 @@ Params<T>::Params(int D, int N, StorageMethod storageMethod) {
 template <typename T>
 Params<T>::Params(const Params<T>& other) {  
 	data = new T[other.D*other.N];
-	for (int i; i<other.D*other.N; ++i) {
+	for (int i = 0; i<other.D*other.N; ++i) {
 		data[i] = other.data[i];
 	}
 	this->D = other.D; 
@@ -73,7 +88,10 @@ Params<T>::Params(const Params<T>& other) {
 }
 
 template <typename T>
-const Params<T>& Params<T>::operator = (const Params<T>& other) {
+const Params<T>& 
+	Params<T>::operator = (
+		const Params<T>& other) 
+{
 	for (int d = 0; d < D; ++d)
 	{
 		for (int i = 0; i < N; ++i)
@@ -95,12 +113,17 @@ unsigned Params<T>::getN() const {
 }
 
 template <typename T>
-typename Params<T>::StorageMethod Params<T>::getStorageMethod() const {
+typename Params<T>::StorageMethod 
+	Params<T>::getStorageMethod() const 
+{
 	return this->storageMethod;
 }
 
 template <typename T>
-T 	 Params<T>::getVal(unsigned dimIdx, unsigned elementIdx) const {
+T 	 Params<T>::getVal(
+	unsigned dimIdx, 
+	unsigned elementIdx) const 
+{
 	if (this->storageMethod == Params<T>::Interleaved)
 		return this->data[elementIdx*D + dimIdx];
 	else
@@ -108,7 +131,11 @@ T 	 Params<T>::getVal(unsigned dimIdx, unsigned elementIdx) const {
 }
 
 template <typename T>
-void Params<T>::setVal(unsigned dimIdx, unsigned elementIdx, T value) 		{
+void Params<T>::setVal(
+	unsigned dimIdx, 
+	unsigned elementIdx, 
+	T value) 
+{
 	if (this->storageMethod == Params<T>::Interleaved)
 		this->data[elementIdx*D + dimIdx] = value;
 	else
@@ -122,8 +149,13 @@ void Params<T>::setAllElementsTo(T value) {
 }
 
 template <typename T>
-void Params<T>::printAllElements () const { 
-	std::cout << "Printing: ";
+void Params<T>::printAllElements (std::string name) const { 
+	std::cout << name << "->data ";
+	if (this->storageMethod == Params<T>::Interleaved)
+		std::cout << "(Interleaved): ";
+	else
+		std::cout << "(Seperated): ";
+
 	for (int i = 0; i < D*N; ++i)
 		std::cout << data[i] << " ";
 	std::cout << "\n";
