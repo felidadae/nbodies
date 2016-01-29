@@ -51,7 +51,7 @@ NBS_State NBS_InitialStateGenerator::rand(
 
 NBS_State NBS_InitialStates::random1() {
 	unsigned D = 3;
-	unsigned N = 15;
+	unsigned N = 120;
 	unsigned stepsNum = 30;
 	NBS_InitialStateGenerator god;
 	NBS_InitialStateGenerator::Ranges ranges;

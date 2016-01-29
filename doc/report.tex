@@ -49,7 +49,7 @@
 \maketitle
 
 \begin{abstract}
-Sprawozdanie z pierwszego etapu projektu z przedmiotu RIM.
+Sprawozdanie z projektu z przedmiotu RIM.
 Tematem projektu jest symulacja ruchu N-ciał 
 (N punktów materialnych pod działaniem siły grawitacji).
 \end{abstract}
@@ -108,81 +108,85 @@ Interesują nas położenia ciał w kolejnych dyskretnych punktach czasu. Przyjm
 
 Co należy podkreślić, wynika z tego, iż do aktualizacji prędkości brana jest poprzednia wartość przyśpieszenia.
 
-Poniżej najistotniejszy fragment kodu w C++ dla CPU. Kod dla przypadku D==2.
+Poniżej główna funkcja step, aktualizująca położenie, prędkość i przyśpieszenie wszystkich cząstek (NBodiesSystem.h/cpp).
 
-\begin{minipage}{\linewidth}
+% \begin{minipage}{\linewidth}
 \begin {lstlisting}[language=C++]
-/*
-    Naming scheme
-    @d <- dim index: x == 0, y == 1 or z == 2
-    @i <- body index
-    @p <- position
-    @v <- velocity
-    @a <- acceleration
-
-    update variables in order: 1) v, 2) p, 3) a
-*/
 void NBodiesSystem::step( time_type delta_t ) {
     p_prev = p_curr;
     v_prev = v_curr;
 
+    /*
+        UPDATE v SPEED and p POSITION
+    */
+
     for (int d = 0; d < D; ++d)
         for (int i = 0; i < N; ++i) {
-            v_curr[d][i] = v_prev[d][i]  +  
-                a[d][i] * delta_t;
-            p_curr[d][i] = p_prev[d][i]  +  
-                (v_prev[d][i] + v_curr[d][i]) 
-                * 0.5 * delta_t;
-
-            //Bouncing off the wall
-            if (p_curr[d][i] > 1 || p_curr[d][i] < -1) 
-                v_curr[d][i] = -v_curr[d][i];
+            v_curr.setVal(d, i, 
+                v_prev.getVal(d, i)  +  
+                a.getVal(d, i) * delta_t);
+            p_curr.setVal(d, i, 
+                p_prev.getVal(d, i)  +  
+                    (v_prev.getVal(d, i) + 
+                    v_curr.getVal(d, i)) 
+                        * 0.5 * delta_t);
         }
+    
+    /*
+        UPDATE a ACCELERATION
+        For each two bodies i,j where i != j;
+    */
 
-    step_a();
-} 
-\end{lstlisting}
-\end{minipage}
+    for (int d = 0; d < D; ++d)
+        for (int i = 0; i < N; ++i)
+            a.setVal(d, i, 0.0f);
 
-
-\begin{minipage}{\linewidth}
-\begin {lstlisting}[language=C++]
-void NBodiesSystem::step_a () {
     for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
             if ( i == j ) continue;
 
-            position_type* r_axis = 
-                new position_type[D];
+            /*
+                delta X, delta Y, delta Z   
+            */
+            position_type* r_axis = new position_type[D];
+            
             position_type r_squared = 0;
             for (int d = 0; d < D; ++d) {
-                r_axis[d] = 
-                    (p_curr[d][i] - p_curr[d][j]);
-                r_squared += 
-                    r_axis[d] * r_axis[d];
+                r_axis[d] = (p_curr.getVal(d, i) - 
+                    p_curr.getVal(d, j));
+                r_squared += r_axis[d] * r_axis[d];
             }
 
-            //To not divide by very small number or zero
             position_type a_scalar = 
-                G * m[0][j] / 
+                G * m.getVal(0, j) / 
                 pow(r_squared + efactor, 1.5);
 
-            for (int d = 0; d < D; ++d)
-                a[d][i] = 
-                    -1 * a_scalar * 
-                    (r_axis[d]/r_squared);
+            for (int d = 0; d < D; ++d) {
+                /*
+                    If both objects positions are 
+                    the same there is division 
+                    by zero; what to do then?
+                    I just set acceleration to 0;
+                */
+                if (r_axis[d]) {
+                    a.setVal(d, i, 
+                        a.getVal(d,i) - 
+                            a_scalar * 
+                            (r_axis[d]/sqrt(r_squared)));
+                }   
+            }
 
             delete [] r_axis;
         }
     }
-}
+} 
 \end{lstlisting}
-\end{minipage}
+% \end{minipage}
 
 \section{Implementacja GPU}
+By uniknąć kopiowania danych pamięć na GPU jest współdzielona przez OpenGL i CUDA. 
+Funkcje zadeklarowane w cuda\_gl\_interop.h pozwalają na to: cudaGraphicsMapResources, cudaGraphicsResourceGetMappedPointer, cudaGraphicsUnmapResources (NBodiesSystemCUDA.cu).
 
-
-\section{Wizualizacja: współdziałanie OpenGL i CUDA}
-
+Implementacja na GPU jest najprostszym przeniesiem kodu działającego na CPU.
 
 \end{document}

@@ -55,10 +55,10 @@ public:
 		nbodiesSystem->step(delta);
 
 		glBindBuffer (GL_ARRAY_BUFFER, vbo);
-		glBindVertexArray (vao);
-		glEnableVertexAttribArray (0);
-		glVertexAttribPointer (0, 3, GL_FLOAT, 
-			GL_FALSE, 0, NULL);
+		// glBindVertexArray (vao);
+		// glEnableVertexAttribArray (0);
+		// glVertexAttribPointer (0, 3, GL_FLOAT, 
+		// 	GL_FALSE, 0, NULL);
 	}
 
 	int getN() { return N; }

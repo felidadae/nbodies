@@ -29,7 +29,7 @@ public:
 		this->D = initialState.D;
 		this->points = new GLfloat[N*D];
 
-		zip_modelPositions_to_points();
+		//zip_modelPositions_to_points();
 	}
 
 	void initOpenGLPart () {

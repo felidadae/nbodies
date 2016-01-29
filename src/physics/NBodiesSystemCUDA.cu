@@ -6,7 +6,7 @@
 
 #define SIZEF(x) (sizeof(float)*(x))
 #define K 512
-#define G 10.0f
+#define G 0.1f
 #define efactor 0.1f
 
 
@@ -96,24 +96,24 @@ static void stepKernel(
 			G * GETVAL(m, 0, j) / pow(r_squared + efactor, 1.5);
 
 		/* START DEBUG */
-		if ( a_scalar != a_scalar ) {
-			printf("\n");
-			printf("D <- %d\n", D);
-			printf("N <- %d\n", N);
-			printf("G <- %f\n", G);
-			printf("i <- %d\n", i);
-			printf("j <- %d\n", j);
-			printf("GETVAL(m, 0, j) <- %f\n", GETVAL(m, 0, j));
-			printf("GETVAL(p_curr, 0, i) <- %f\n", GETVAL(p_curr, 0, i));
-			printf("GETVAL(p_curr, 0, j) <- %f\n", GETVAL(p_curr, 0, j));
-			printf("GETVAL(p_curr, 1, i) <- %f\n", GETVAL(p_curr, 1, i));
-			printf("GETVAL(p_curr, 1, j) <- %f\n", GETVAL(p_curr, 1, j));
-			printf("GETVAL(p_curr, 2, i) <- %f\n", GETVAL(p_curr, 2, i));
-			printf("GETVAL(p_curr, 2, j) <- %f\n", GETVAL(p_curr, 2, j));
-			printf("r_squared <- %f\n", r_squared);
-			printf("efactor <- %f\n", efactor);
-			printf("\n");
-		}
+		// if ( a_scalar != a_scalar ) {
+		// 	printf("\n");
+		// 	printf("D <- %d\n", D);
+		// 	printf("N <- %d\n", N);
+		// 	printf("G <- %f\n", G);
+		// 	printf("i <- %d\n", i);
+		// 	printf("j <- %d\n", j);
+		// 	printf("GETVAL(m, 0, j) <- %f\n", GETVAL(m, 0, j));
+		// 	printf("GETVAL(p_curr, 0, i) <- %f\n", GETVAL(p_curr, 0, i));
+		// 	printf("GETVAL(p_curr, 0, j) <- %f\n", GETVAL(p_curr, 0, j));
+		// 	printf("GETVAL(p_curr, 1, i) <- %f\n", GETVAL(p_curr, 1, i));
+		// 	printf("GETVAL(p_curr, 1, j) <- %f\n", GETVAL(p_curr, 1, j));
+		// 	printf("GETVAL(p_curr, 2, i) <- %f\n", GETVAL(p_curr, 2, i));
+		// 	printf("GETVAL(p_curr, 2, j) <- %f\n", GETVAL(p_curr, 2, j));
+		// 	printf("r_squared <- %f\n", r_squared);
+		// 	printf("efactor <- %f\n", efactor);
+		// 	printf("\n");
+		// }
 		/* END__ DEBUG */
 		
 

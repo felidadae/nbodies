@@ -2,7 +2,7 @@
 #include <cmath>
 
 
-const position_type NBodiesSystem::G = 10;
+const position_type NBodiesSystem::G = 0.3;
 const position_type NBodiesSystem::efactor = 0.1;
 
 NBodiesSystem::NBodiesSystem(
