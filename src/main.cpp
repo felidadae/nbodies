@@ -16,7 +16,7 @@ void printState( NBS_State& state ) {
 
 int main() {
 	NBS_State state_0 = 
-		NBS_InitialStates::random1();
+		NBS_InitialStates::inCircle1();
 
 	//printState(state_0);
 	// return 0;

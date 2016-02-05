@@ -27,6 +27,20 @@ doc/report.pdf: doc/report.tex
 #-------------------------------------------------------------
 
 
+
+#-------------------------------------------------------------
+#***
+# Run 
+#***
+
+runCPU:
+	bin/allCPU
+runGPU:
+	bin/allCUDA
+#-------------------------------------------------------------
+
+
+
 #-------------------------------------------------------------
 #***
 # How to build any objective file
@@ -103,7 +117,7 @@ bin/allCUDA: build/mainCUDA.o build/InitialState.o build/NBodiesSystemCUDA.o bui
 
 #-------------------------------------------------------------
 #***
-.PHONY: clean doc allCPU allCUDA echoSettings
+.PHONY: clean doc allCPU allCUDA echoSettings runCPU runGPU
 
 clean:
 	rm -r $(DIR_BIN)/*; rm -r $(DIR_BUILD)/*;

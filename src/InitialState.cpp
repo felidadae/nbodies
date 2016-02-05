@@ -1,5 +1,5 @@
 #include "InitialState.h"
-
+#include <cmath>
 
 
 NBS_State::NBS_State(int D, int N):
@@ -48,6 +48,43 @@ NBS_State NBS_InitialStateGenerator::rand(
 
 
 
+NBS_State NBS_InitialStateGenerator::symetricalInCircle(
+	int D, int N,
+	position_type middleX,
+	position_type middleY,
+	position_type R
+) 
+{	
+	NBS_State state(D, N);
+
+	position_type radiusStep = 2 * M_PI / N;
+
+	//	Rand position and speed
+	for (int i = 0; i < N; ++i) {
+		position_type alpha = i*radiusStep;
+
+		position_type deltaX = sin(alpha) * R;
+		position_type deltaY = cos(alpha) * R; 
+
+		state.p_0.setVal(X, i, deltaX + middleX);
+		state.p_0.setVal(Y, i, deltaY + middleY);
+	}
+
+	//	For 3 dimensions zeros
+	for (int i = 0; i < N; ++i) {
+		state.p_0.setVal(Z, i, 0.0);
+		state.v_0.setVal(Z, i, 0.0);
+	}
+
+	//	Mass
+	for (int i = 0; i < N; ++i)
+			state.m_0.setVal(0, i, 1.0f);
+
+	return state;
+}
+
+
+
 
 NBS_State NBS_InitialStates::random1() {
 	unsigned D = 3;
@@ -65,6 +102,23 @@ NBS_State NBS_InitialStates::random1() {
 	return 
 		god.rand(
 			D, N, ranges, stepsNum);
+}
+
+NBS_State NBS_InitialStates::inCircle1() {
+	NBS_InitialStateGenerator god;
+
+	int D = 3;
+	int N = 8*4;
+	position_type middleX = 0.0f;
+	position_type middleY = 0.0f;
+	position_type R = 0.5f;
+
+	return god.symetricalInCircle(
+		D, N,
+		middleX,
+		middleY,
+		R
+	);
 }
 
 NBS_State NBS_InitialStates::_2bodies() {

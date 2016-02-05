@@ -40,8 +40,13 @@ void NBodiesSystem::step( time_type delta_t ) {
 
 	for (int d = 0; d < D; ++d)
 		for (int i = 0; i < N; ++i) {
-			v_curr.setVal(d, i, v_prev.getVal(d, i)  +  a.getVal(d, i) * delta_t);
-			p_curr.setVal(d, i, p_prev.getVal(d, i)  +  (v_prev.getVal(d, i) + v_curr.getVal(d, i)) * 0.5 * delta_t);
+			v_curr.setVal(d, i, 
+				v_prev.getVal(d, i)  
+				+  a.getVal(d, i) * delta_t);
+			p_curr.setVal(d, i, 
+				p_prev.getVal(d, i)  +  
+				(v_prev.getVal(d, i) + v_curr.getVal(d, i)) 
+					* 0.5 * delta_t);
 			if (p_curr.getVal(d, i) > 1 || p_curr.getVal(d, i) < -1) 
 				v_curr.setVal(d, i, -v_curr.getVal(d, i));
 		}
@@ -69,7 +74,8 @@ void NBodiesSystem::step( time_type delta_t ) {
 			
 			position_type r_squared = 0;
 			for (int d = 0; d < D; ++d) {
-				r_axis[d] = (p_curr.getVal(d, i) - p_curr.getVal(d, j));
+				r_axis[d] = (p_curr.getVal(d, i) 
+					- p_curr.getVal(d, j));
 				r_squared += r_axis[d] * r_axis[d];
 			}
 

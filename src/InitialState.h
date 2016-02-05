@@ -66,6 +66,17 @@ public:
 	*/
 	NBS_State rand(int D, int N, Ranges& ranges, int steps);
 
+	/*
+		Return initial state (p,v,m) with 
+		values symetrically in a circle 
+	*/
+	NBS_State symetricalInCircle(
+		int D, int N,
+		position_type middleX,
+		position_type middleY,
+		position_type R
+	);
+
 private:
 	FloatingNumberRandomGenerator<position_type> 	
 		randgen_position;
@@ -77,6 +88,7 @@ private:
 
 namespace NBS_InitialStates {
 	NBS_State random1();
+	NBS_State inCircle1();
 	NBS_State _2bodies();
 };
 

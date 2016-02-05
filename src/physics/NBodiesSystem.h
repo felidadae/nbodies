@@ -2,7 +2,7 @@
 #define N_BODIES_SYSTEM_HEADER
 
 #include "Params.h"
-#define DEBUG_PRINT_POINTS_POSITIONS
+//#define DEBUG_PRINT_POINTS_POSITIONS
 
 
 

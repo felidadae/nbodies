@@ -2,8 +2,8 @@
 #define N_BODIES_SYSTEM_TYPES_HEADER
 
 
-typedef float position_type;
-typedef float mass_type;
+typedef double position_type;
+typedef double mass_type;
 typedef double time_type;
 
 #endif

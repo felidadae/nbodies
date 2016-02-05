@@ -56,13 +56,13 @@ void updateWindoWFPSCounter (GLFWwindow* window) {
 	}
 	frame_count++;
 }
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------
 
 
 
 
 
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------
 /*
 	helper
 */
@@ -78,14 +78,23 @@ void updateWindoWFPSCounter (GLFWwindow* window) {
 */
 struct Points {
 	GLfloat* data;
-	GLfloat get(int directionDim, int pointDim) 				{ return data[directionDim + pointDim*3]; }
-	void 	set(int directionDim, int pointDim, GLfloat value) 	{ data[directionDim+ pointDim*3] = value;  }
+	GLfloat get(int directionDim, int pointDim) { 
+		return data[directionDim + pointDim*3]; 
+	}
+	void 	set(int directionDim, int pointDim, GLfloat value) { 
+		data[directionDim+ pointDim*3] = value;  
+	}
 };
 
 /*
 	create 2D circle, point[Z] == 0 for each point, where Z==2
 */
-GLfloat* createCircleOfEmotions(GLfloat middleX, GLfloat middleY, GLfloat R, unsigned triangleNum) {
+GLfloat* createCircleOfEmotions(
+	GLfloat middleX, 
+	GLfloat middleY, 
+	GLfloat R, 
+	unsigned triangleNum) 
+{
 	int pointsNum = triangleNum+3;
 
 	GLfloat radiusStep = 2*M_PI / triangleNum;
@@ -120,7 +129,10 @@ GLfloat* createCircleOfEmotions(GLfloat middleX, GLfloat middleY, GLfloat R, uns
 
 __global__
 static void createCircleOfEmotionsCUDA(
-	GLfloat middleX, GLfloat middleY, GLfloat R, unsigned triangleNum, 
+	GLfloat middleX, 
+	GLfloat middleY, 
+	GLfloat R, 
+	unsigned triangleNum, 
 	GLfloat* positions)
 {
 	int it = threadIdx.x + blockIdx.x*blockDim.x;
@@ -134,13 +146,13 @@ static void createCircleOfEmotionsCUDA(
 		positions[ it*3 + 2 	] = 0.0f;
 	}
 }
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------
 
 
 
 
 
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------
 int main () {
 	if (!glfwInit ()) {
 		fprintf (stderr, "ERROR: could not start GLFW3\n");
@@ -155,7 +167,8 @@ int main () {
 #endif
 
 	glfwWindowHint (GLFW_SAMPLES, 4);
-	GLFWwindow* window = glfwCreateWindow (600, 600, "Hello Triangle", NULL, NULL);
+	GLFWwindow* window = 
+		glfwCreateWindow (600, 600, "Hello Triangle", NULL, NULL);
 	if (!window) {
 		fprintf (stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
@@ -176,16 +189,15 @@ int main () {
 	std::cout << "fbheight" << fbheight << std::endl;
 
 	// get version info
-	const GLubyte* renderer = glGetString (GL_RENDERER); 	// get renderer string
-	const GLubyte* version = glGetString (GL_VERSION); 		// version as a string
+	const GLubyte* renderer = glGetString (GL_RENDERER); 	
+	const GLubyte* version = glGetString (GL_VERSION); 		
 	printf ("Renderer: %s\n", renderer);
 	printf ("OpenGL version supported %s\n", version);
 
-	// tell GL to only draw onto a pixel if the shape is closer to the viewer
-	glEnable 	(GL_DEPTH_TEST); 	// enable depth-testing
-	glDepthFunc (GL_LESS); 			// depth-testing interprets a smaller value as "closer"
+	glEnable 	(GL_DEPTH_TEST); 	
+	glDepthFunc (GL_LESS); 			
 
-	//--------------------------------------------------------
+	//---------------------------------------------------------------
 	//Model with CUDA
 	// vbo variables
 
@@ -248,7 +260,7 @@ int main () {
 		);
 	glm::mat4 mvp;
 	GLuint MatrixID = glGetUniformLocation(shader_programme, "MVP");
-	//--------------------------------------------------------
+	//---------------------------------------------------------------
 
 
 	float angle = 0.0f;
@@ -265,7 +277,8 @@ int main () {
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 		glBindVertexArray (vao);
 		
-		// draw points 0-3 from the currently bound VAO with current in-use shader
+		// draw points 0-3 from the currently 
+		// bound VAO with current in-use shader
 		glDrawArrays (GL_TRIANGLE_FAN, 0, vertexNum);
 		
 		// update other events like input handling 
@@ -278,7 +291,7 @@ int main () {
 	// close GL context and any other GLFW resources
 	glfwTerminate();
 }
-//------------------------------------------------------------------------------------
+//-------------------------------------------------------------------
 
 
 

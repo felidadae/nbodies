@@ -5,9 +5,9 @@
 
 #include "../types.h"
 
-static const int X = 0;
-static const int Y = 1;
-static const int Z = 2;
+#define X 0
+#define Y 1
+#define Z 2
 
 #define INTERLEAVED Params<position_type>::Interleaved
 #define INTERLEAVED_INT 1

@@ -62,8 +62,9 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 #endif
 
 	// create GLFW window
-	GLFWwindow* window = glfwCreateWindow (800, 600, 
-		"NBodiesSystem", NULL, NULL);
+	GLFWwindow* window 
+		= glfwCreateWindow (600, 600, 
+			"NBodiesSystem", NULL, NULL);
 	if (!window) {
 		fprintf (stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
@@ -92,9 +93,11 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 	printf ("OpenGL version supported %s\n", version);
 #endif
 
-	// tell GL to only draw onto a pixel if the shape is closer to the viewer
+	// tell GL to only draw onto 
+	// a pixel if the shape is closer to the viewer
 	glEnable 	(GL_DEPTH_TEST); 	// enable depth-testing
-	glDepthFunc (GL_LESS); 			// depth-testing interprets a smaller value as "closer"
+	glDepthFunc (GL_LESS); 			// depth-testing interprets
+									// a smaller value as "closer"
 
 	
 	//--------------------------------------------------------
@@ -106,14 +109,15 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 			"src/visualization/shader.frag"
 		);
 	glm::mat4 mvp(1.0);
-	GLuint MatrixID = glGetUniformLocation(shader_programme, "MVP");
+	GLuint MatrixID = 
+		glGetUniformLocation(shader_programme, "MVP");
 	//--------------------------------------------------------
 
 	int iiter = 0;
 	while (!glfwWindowShouldClose (window)) {
 		float deltaTime = elapsedTime();
-		glbridge->stepPositions(deltaTime/10.0);
-		glClearColor(0.0,0.3,0.0,0.2);
+		glbridge->stepPositions(deltaTime/15.0);
+		glClearColor(0.43f/2.5f,0.48f/2.5f,0.59f/2.5f,1.0);
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram (shader_programme);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
