@@ -1,6 +1,6 @@
 \documentclass[fleqn]{article}
 \usepackage{graphicx}
-\usepackage{polski}
+% \usepackage{polski}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 \usepackage{amsmath}
@@ -37,57 +37,54 @@
 }
 \lstset{style=mystyle}
 
-% \usepackage{color}
-% \color{white}
-% \pagecolor{black}
+\usepackage{color}
+\definecolor{light-gray}{gray}{0.20}
+\color{white}
+\pagecolor{light-gray}
 
 \begin{document}
 
-\title{Symulacja ruchu N-ciał}
-\author{Szymon Bugaj, Lei Peng}
+\title{N-bodies simulation}
+\author{Szymon Bugaj}
 
 \maketitle
 
 \begin{abstract}
-Sprawozdanie z projektu z przedmiotu RIM.
-Tematem projektu jest symulacja ruchu N-ciał 
-(N punktów materialnych pod działaniem siły grawitacji).
+A system of N material points under the force of gravity. Symulation and visualisation.
 \end{abstract}
 
 \tableofcontents
 
 
 
-\section{Wstęp teoretyczny}
-Projekt stanowi symulacja i wizualizacja praw fizyki klasycznej newtonowskiej. Szczególnie 3 praw dynamiki Newtona oraz siły grawitacji pomiędzy zbiorem N punktów materialnych.
+\section{Theoretical introduction}
+The project is devoted to symulation and visualisation of the problem of N-bodies. 
 
-Newtonowska siła grawitacji pomiędzy dwoma punktami materialnymi:
+Newtonian gravitational force between two material points is given as:
 \begin{align*}
     &\vec{F_{G}} = G\frac{m_{1} m_{2}}{\|r\|^{2}}\frac{\vec{r}}{\|r\|} \\
 \end{align*}
 
-W fizyce klasycznej zależnością łączącą masę przyśpieszenie i siłę działającą na ciało jest:
+In the classical physics, the equation linking acceleration, mass and force is given as follow:
 \begin{align*}
     &\vec{F} = \vec{a}m \\
 \end{align*}
 
-Związek między położeniem, prędkością a przyśpieszeniem jest następujący:
+The relationship between the position, velocity and acceleration is given by equations:
 \begin{align*}
     &v(t) = \frac{dp(t)}{dt} \\
     &a(t) = \frac{dv(t)}{dt} \\
 \end{align*}
 
-Mając dane położenia wszystkich N cząstek oraz ich prędkości dla danego momentu,
-korzystając z powyższych równań możemy obliczyć położenie dla dowolnego punktu w dowolnym innym momencie.
+Given the position of all N particles and the speed for a given torque, using the above equations, we can calculate the location for any point at any other time.
 
-\section{Rozkładanie siły grawitacji na składowe względem osi współrzędnych}
-W przypadku 2D należy rozpatrzyć prostokąt o bokach równoległych do osi X i Y, gdzie w przeciwległych
-wierzchołkach leżą dwa rozpatrywane ciała.
+\section{Resolution of gravity into components parallel to axis}
+In the case of 2D should be considered rectangle with sides parallel to the axes X and Y, where the opposite tops are considered two of the body.
 
 \begin{frame}
-\frametitle{Rozkład wektora siły na składowe}
+\frametitle{Resolution of gravity into components}
 \begin{center}
-\includegraphics[width=8cm]{rozkladsil.pdf}
+\includegraphics[width=8cm]{resolutionofgravity.pdf}
 \end{center}
 \end{frame}
 
@@ -96,19 +93,17 @@ wierzchołkach leżą dwa rozpatrywane ciała.
     &a_{y}(t) = cos\alpha * a \\
 \end{align*}
 
-Dla przypadku 3D należy rozpatrzyć w analogiczny sposób prostopadłościan (ciała powinny znajdować się w wierzchołkach po przeciwnych ścianach, po przeciwnych rogach).
+For the 3D case should be considered in an analogous manner Box (body should be at the vertices of the opposite walls at opposite corners).
 
-\section{Model numeryczny}
-Interesują nas położenia ciał w kolejnych dyskretnych punktach czasu. Przyjmujemy, że w przeciągu jednostki czasu wielkości prękość, przyśpieszenie są stałe. Aktualizujemy interesujące nas wielkości w kolejności:
+\section{Numerical model}
+We are interesed in position of each of a body in proceding discrete time moments. We assume, that during a smallest time unit speed, acceleration of a body is constant. All variables are updated in order: 
 \begin{itemize}
-    \item 1) aktualizacja prędkości
-    \item 2) aktualizacja położenia
-    \item 3) aktualizacja przyśpieszenia
+    \item 1) speed
+    \item 2) position
+    \item 3) acceleration
 \end{itemize}
 
-Co należy podkreślić, wynika z tego, iż do aktualizacji prędkości brana jest poprzednia wartość przyśpieszenia.
-
-Poniżej główna funkcja step, aktualizująca położenie, prędkość i przyśpieszenie wszystkich cząstek (NBodiesSystem.h/cpp).
+What must be stressed, in consequence in calculation of update of speed is taken previous value of acceleration.
 
 % \begin{minipage}{\linewidth}
 \begin {lstlisting}[language=C++]
@@ -182,11 +177,5 @@ void NBodiesSystem::step( time_type delta_t ) {
 } 
 \end{lstlisting}
 % \end{minipage}
-
-\section{Implementacja GPU}
-By uniknąć kopiowania danych pamięć na GPU jest współdzielona przez OpenGL i CUDA. 
-Funkcje zadeklarowane w cuda\_gl\_interop.h pozwalają na to: cudaGraphicsMapResources, cudaGraphicsResourceGetMappedPointer, cudaGraphicsUnmapResources (NBodiesSystemCUDA.cu).
-
-Implementacja na GPU jest najprostszym przeniesiem kodu działającego na CPU.
 
 \end{document}
