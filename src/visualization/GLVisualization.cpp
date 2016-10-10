@@ -1,13 +1,20 @@
 #include "GLVisualization.h"
+#include <csignal>
 
 #if defined(__APPLE__) || defined(MACOSX)
 	#define GLFW_INCLUDE_GLCOREARB
 #endif
+
+#include <GL/glew.h>
+/* #include <glad/glad.h> */
 #include <GLFW/glfw3.h> // GLFW helper library
+
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 	#include <GL/wglew.h>
 #endif
+
 #include <glm/glm.hpp>
+
 #include <glm/gtx/transform.hpp>
 #include <iostream>
 #include <fstream>
@@ -53,17 +60,24 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 	}
 
 #if defined(__APPLE__) || defined(MACOSX)
-	// to use the newest available Opengl
-	// at least OpenGL 3.2
+	/* to use the newest available Opengl
+		at least OpenGL 3.2*/
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
+	/* glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3); */
+	/* glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 2); */
+	/* glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); */
+	/* glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); */
+	glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	// create GLFW window
 	GLFWwindow* window 
-		= glfwCreateWindow (600, 600, 
+		= glfwCreateWindow (1200, 1200, 
 			"NBodiesSystem", NULL, NULL);
 	if (!window) {
 		fprintf (stderr, "ERROR: could not open window with GLFW3\n");
@@ -72,18 +86,23 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 	}
 	glfwMakeContextCurrent (window);
 
-#if defined(__APPLE__) || defined(MACOSX)
-#else
-	// start GLEW extension handler
-	glewExperimental = GL_TRUE;
-	glewInit ();
-#endif
 
+	/* GLEW init */
+	glewExperimental = GL_TRUE;
+	glewInit();
+	printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cout << "OpenGL error: " << err << std::endl;
+    }
+
+/* #define __DEBUG__ */
 #if defined(__DEBUG__)
 	//FrameBuffer size
 	int fbwidth, fbheight;
 	glfwGetFramebufferSize(window, &fbwidth, &fbheight);
-	std::cout << "fbwidth" << fbwidth << std::endl;
+	std::cout << "fbwidth"  << fbwidth << std::endl;
 	std::cout << "fbheight" << fbheight << std::endl;
 
 	// get version info
@@ -93,6 +112,7 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 	printf ("OpenGL version supported %s\n", version);
 #endif
 
+
 	// tell GL to only draw onto 
 	// a pixel if the shape is closer to the viewer
 	glEnable 	(GL_DEPTH_TEST); 	// enable depth-testing
@@ -100,8 +120,11 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 									// a smaller value as "closer"
 
 	
+
+
 	//--------------------------------------------------------
 	glbridge->initOpenGLPart();
+	
 
 	GLuint shader_programme = 
 		LoadShader(
@@ -122,6 +145,11 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 		glUseProgram (shader_programme);
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
 		glPointSize(10);
+
+		// Generate an interrupt
+		/* std::raise(SIGINT); */
+
+		glEnableClientState(GL_VERTEX_ARRAY);
 		glDrawArrays (GL_POINTS, 0, glbridge->getN());
 		glfwPollEvents ();
 		glfwSwapBuffers (window);
@@ -133,8 +161,4 @@ void start (GLBridgeInterface* glbridge, int maxiter) {
 	// close GL context and any other GLFW resources
 	glfwTerminate();
 }
-
-
-
-
 

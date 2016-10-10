@@ -4,9 +4,12 @@
 #if defined(__APPLE__) || defined(MACOSX)
 	#define GLFW_INCLUDE_GLCOREARB
 #endif
+
+#include <GL/glew.h>
 #include <GLFW/glfw3.h> // GLFW helper library
 #include "../physics/NBodiesSystem.h"
 
+#include <stdio.h>
 #include <iostream>
 #include "../InitialState.h"
 #include "GLBridgeInterface.h"
@@ -34,6 +37,10 @@ public:
 
 	void initOpenGLPart () {
 		glGenBuffers (1, &vbo);
+		GLenum err;
+		while ((err = glGetError()) != GL_NO_ERROR) {
+			std::cout << "OpenGL error: " << err << std::endl;
+		}
 		glBindBuffer (GL_ARRAY_BUFFER, vbo);
 		glBufferData (GL_ARRAY_BUFFER, 
 			D * N * sizeof (GLfloat), 

@@ -8,3 +8,4 @@ test.md
 doc/*.aux
 doc/*.toc
 doc/*.log
+tags
