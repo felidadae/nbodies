@@ -13,3 +13,7 @@ Depends on glfw, glew, glm.
 On ubuntu 16.04 run script  
 https://github.com/felidadae/graphicslab/blob/master/dependencies/install_opengl.sh
 [1]: https://en.wikipedia.org/wiki/N-body_problem "wiki"
+
+Demo
+---------------------
+Demo video on vimeo: https://vimeo.com/251136833
